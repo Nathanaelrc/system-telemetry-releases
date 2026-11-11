@@ -1,100 +1,129 @@
-# System Telemetry — Releases
+# System Telemetry
 
-Paquetes de instalación públicos para **System Telemetry**, un dashboard nativo
-GTK 4 para monitorizar hardware y gestionar perfiles de energía en Linux.
+## Español (Chile)
 
-Public installation packages for **System Telemetry**, a native GTK 4 Linux
-hardware and power-profile dashboard.
+Lo hice como un proyecto personal para revisar el hardware y los perfiles de
+energía de mis equipos Linux. Si te sirve, puedes descargarlo y usarlo también.
+Es una aplicación GTK 4 sencilla, con temas claro y oscuro, sin efectos llamativos.
+No es una herramienta oficial de NVIDIA, System76 ni TUXEDO.
 
-## Descargar / Download
+### Descargar e instalar
 
-Abre [Releases](https://github.com/Nathanaelrc/system-telemetry-releases/releases)
-y descarga el formato de tu distribución:
+En [Releases](https://github.com/Nathanaelrc/system-telemetry-releases/releases/latest)
+están los paquetes y `SHA256SUMS`.
 
-- Ubuntu 22.04+, Debian 12+, TUXEDO OS: `system-telemetry-dashboard_*_all.deb`
-- Fedora 39+: `system-telemetry-dashboard-*.noarch.rpm`
-- `SHA256SUMS`: comprobación de integridad / integrity verification.
+- **DEB:** Ubuntu 22.04+, Debian 12+ y derivados con Python 3.10+ y GTK 4.6+.
+- **RPM:** Fedora 39+.
+- Usa el paquete de tu distribución; no instales el RPM en Debian.
 
-Los paquetes son independientes de la arquitectura; necesitan Python 3.10+,
-GTK 4.6+, PyGObject y Cairo del sistema. `apt`/`dnf` resuelven las dependencias.
-No incluyen un runtime autónomo ni las fuentes Fira.
-
-Packages are architecture-independent and require the host's Python 3.10+,
-GTK 4.6+, PyGObject and Cairo. `apt`/`dnf` resolve dependencies.
-
-## Instalar / Install
-
-En la carpeta de descarga / in your download directory:
+Desde la carpeta donde descargaste los archivos:
 
 ```bash
 sha256sum -c SHA256SUMS
 
-# Debian / Ubuntu / TUXEDO OS
-sudo apt install ./system-telemetry-dashboard_0.2.0_all.deb
+# Ubuntu / Debian / TUXEDO OS
+sudo apt install ./system-telemetry-dashboard_0.3.0_all.deb
 
-# Fedora (no uses este comando en Debian / do not run this on Debian)
-sudo dnf install ./system-telemetry-dashboard-0.2.0-1.noarch.rpm
+# Fedora
+sudo dnf install ./system-telemetry-dashboard-0.3.0-1.noarch.rpm
 
 system-telemetry
 ```
 
-También aparece en el menú de aplicaciones. Fira Sans y Fira Mono son opcionales:
-si no están instaladas, se usan fuentes del sistema.
+También aparece en el menú de aplicaciones. `apt` y `dnf` resuelven las
+dependencias. Usa Python, GTK, PyGObject y Cairo del sistema; Fira Sans y Fira
+Mono vienen incluidas, con su licencia SIL OFL. No descarga fuentes al abrir.
 
-The application also appears in the desktop menu. Fira Sans/Mono are optional;
-system fonts are used when unavailable.
+### Qué incluye
 
-## Características / Features
+- Uso de CPU/GPU, RAM y swap, disco, red, sensores, historial y exportación CSV.
+- Interfaz en español chileno e inglés, con idioma y tema guardados.
+- Tarjetas ordenadas, chevrons discretos e hilos CPU en una o dos filas.
+- Perfiles del único gestor activo: TUXEDO, Power Profiles, tuned, auto-cpufreq,
+  TLP y System76 Power. tuned-ppd y los puentes de System76 usan D-Bus.
+- En una sesión COSMIC, **Sistema** sigue su paleta GTK y acento. Necesita el
+  tema GTK exportado por COSMIC y su portal. **Claro/Oscuro** conservan VS Code.
+  Fuera de COSMIC se mantiene el comportamiento anterior.
+- Ventiladores AMD PWM y NVIDIA NVML en Wayland/X11, cuando el driver lo permite.
+  NVIDIA también tiene una alternativa NV-CONTROL para X11.
+- Pruebas de ventilación de **30 segundos**, entre **50 y 100 %** y dentro de
+  los límites del driver, con retorno automático y un límite de **80 °C**.
+  Los controles que requieren permisos usan un helper restringido con polkit;
+  la aplicación completa no se ejecuta como root.
 
-- CPU/GPU, RAM/swap, disco/red, sensores, historial y exportación CSV.
-- Temas claro/oscuro y traducción español/inglés.
-- Control de TUXEDO `tccd` o Power Profiles, incluida la interfaz de `tuned-ppd`.
-- Control del único gestor activo: TUXEDO, Power Profiles, tuned, auto-cpufreq o TLP.
-  tuned-ppd usa la interfaz Power Profiles; System76 Power solo se detecta.
-- Tarjetas con gráficos alineados e hilos CPU compactos: una fila hasta 12, dos para más.
-- Ventiladores AMD PWM y NVIDIA NV-CONTROL X11 cuando el driver los permite.
-  Pruebas manuales de 30 s, 50–100 %, retorno automático y límite de 80 °C.
-- Wayland/X11 con decoraciones nativas; helper restringido con autorización polkit.
+### Lo que conviene saber
 
-Hardware telemetry, history, CSV export, light/dark themes, Spanish/English,
-TUXEDO/Power Profiles integration and native Wayland/X11 decorations.
-Version 0.2.0 adds active-manager controls for tuned, auto-cpufreq and TLP,
-a restricted polkit helper, aligned charts and compact CPU bars.
-GPU manual fan tests are bounded to 30 seconds at 50–100%, restore automatic
-control on completion/errors and enforce an 80°C guard. AMD requires exposed
-PWM sensors; NVIDIA requires accessible X11 NV-CONTROL and driver permission.
+Los sensores dependen del equipo y del driver. Si una lectura no está disponible,
+se muestra N/D, sin inventar temperaturas ni Watts. La lectura Intel basada en
+clientes DRM accesibles no representa toda la carga GPU.
 
-Las lecturas GPU dependen del hardware y del controlador. Los sensores ausentes
-se muestran como N/D; no se inventan temperaturas ni Watts. La carga Intel basada
-en clientes DRM accesibles no equivale a carga global. No se activan servicios
-ni se modifican curvas de ventiladores; un cambio de perfil puede ser rechazado
-por la política D-Bus o polkit existente. Los perfiles TUXEDO son temporales.
-No se modifican Coolbits ni Xorg. No se inicia una prueba sobre otro control
-manual. El retorno automático no se puede garantizar ante SIGKILL o fallo del
-driver; estos controles no reemplazan la gestión térmica del fabricante.
+No instala gestores, no cambia Coolbits/Xorg y no modifica curvas persistentes
+de ventiladores. Los perfiles TUXEDO son temporales. El control NVIDIA en Windows
+no garantiza que el driver Linux lo permita. Las pruebas de ventilación no
+reemplazan la gestión térmica del fabricante; el retorno automático no se puede
+garantizar ante SIGKILL, fallas del driver o un corte de energía.
 
-GPU readings depend on hardware and driver support. Missing values remain N/A.
-Intel accessible-client DRM load is not global utilization. No services are
-enabled and no fan curves are changed; existing D-Bus/polkit policy may reject
-changes. Cooling tests do not replace vendor thermal management. Automatic
-restoration cannot be guaranteed after SIGKILL or driver failure.
+La versión 0.3.0 se comprobó en TUXEDO OS/KDE Wayland: **95 pruebas**, renderizado
+GTK y arranque de ambos paquetes con datos reales. Fedora fue confirmado por
+el usuario en versiones anteriores. Pop!_OS, COSMIC, Cinnamon y Xfce todavía
+necesitan pruebas en sus entornos reales; los adaptadores y la integración COSMIC
+se probaron con simulaciones. No se probaron escrituras físicas AMD/NVIDIA aquí.
 
-## Alcance / Scope
+Este repositorio publica documentación y paquetes. El código fuente se mantiene
+en un repositorio privado; los paquetes incluyen los módulos Python necesarios.
+Puedes usar la aplicación, pero eso no concede una licencia de código abierto.
+Las fuentes Fira conservan su licencia propia. Los paquetes no tienen firma GPG:
+SHA-256 sirve para comprobar integridad, no como firma independiente.
 
-Este repositorio solo publica documentación y paquetes, no el repositorio fuente.
-Los paquetes instalables sí incluyen los módulos Python necesarios para ejecutar
-la aplicación. No se concede una licencia de código abierto.
+## English
 
-This repository publishes documentation and packages, not the source repository.
-Installable packages do contain the required Python modules. No open-source
-license is granted.
+I made this as a personal project to check hardware and power profiles on my
+Linux computers. If it is useful to you, you are welcome to download and use it.
+It is a simple GTK 4 app with light and dark themes, without flashy effects.
+It is not an official NVIDIA, System76 or TUXEDO tool.
 
-La versión 0.2.0 se ha comprobado en TUXEDO OS/KDE Wayland con 58 pruebas.
-El usuario confirmó que la versión 0.1.0 funciona en Fedora; la instalación
-0.2.0 y los controles de cada gestor/GPU en Fedora aún requieren verificación.
-Las pruebas de escritura de controles usan sensores y herramientas simulados.
+### Download and install
 
-Version 0.2.0 was checked on TUXEDO OS/KDE Wayland with 58 passing tests.
-The user reported 0.1.0 working on Fedora; 0.2.0 installation and real manager/GPU
-controls on Fedora remain unverified. Control-writing tests use simulated
-sensors and tools. Packages are not GPG-signed; use SHA256SUMS for integrity.
+Get your distribution's package and `SHA256SUMS` from
+[Releases](https://github.com/Nathanaelrc/system-telemetry-releases/releases/latest).
+Use the commands above: DEB for Ubuntu 22.04+, Debian 12+ and compatible
+derivatives; RPM for Fedora 39+. Do not use the RPM on Debian.
+
+The app also appears in the desktop menu. It needs host Python 3.10+, GTK 4.6+,
+PyGObject and Cairo; `apt`/`dnf` resolve dependencies. Fira Sans/Mono and their
+SIL OFL license are included. Fonts are not downloaded at startup.
+
+### What is included
+
+- CPU/GPU, RAM/swap, disk/network, sensors, history and CSV export.
+- Chilean Spanish and English, with saved language and theme preferences.
+- Tidier cards, subtle chevrons and CPU bars in one or two rows.
+- Controls for the single active manager: TUXEDO, Power Profiles, tuned,
+  auto-cpufreq, TLP and System76 Power. PPD bridges are grouped by bus owner.
+- In a COSMIC session, **System** follows its exported GTK palette and portal
+  accent. **Light/Dark** keep the VS Code palettes. Other desktops are unchanged.
+- Conditional AMD PWM and NVIDIA NVML fan controls on Wayland/X11, with an
+  X11 NV-CONTROL fallback. Tests last **30 seconds**, use **50–100%** within
+  driver limits, restore automatic mode and stop at **80°C**.
+- A restricted polkit helper for privileged controls; the GUI does not run as root.
+
+### Things to keep in mind
+
+Hardware support varies. Missing readings stay N/A. Intel accessible-client DRM
+load is not global GPU load. The app does not install energy managers, change
+Coolbits/Xorg or set persistent fan curves. TUXEDO profiles are temporary.
+Windows fan support does not guarantee Linux driver support. Cooling tests do
+not replace vendor thermal management, and automatic restoration cannot be
+guaranteed after SIGKILL, driver failure or power loss.
+
+Version 0.3.0 was checked on TUXEDO OS/KDE Wayland with **95 passing tests**,
+GTK rendering and live launches of both packages. Earlier versions were
+user-confirmed on Fedora. Pop!_OS, COSMIC, Cinnamon and Xfce still need testing
+on real systems; adapters and COSMIC integration were tested with simulations.
+Physical AMD/NVIDIA fan writes were not tested on this development machine.
+
+This repository contains documentation and packages, not the private source
+repository. Packages include the Python modules needed to run the app.
+You are welcome to use it; no open-source license is granted. Fira fonts retain
+their own license. Packages are not GPG-signed; SHA-256 checks integrity and is
+not an independent signature.
