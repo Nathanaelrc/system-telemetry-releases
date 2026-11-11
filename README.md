@@ -30,10 +30,10 @@ En la carpeta de descarga / in your download directory:
 sha256sum -c SHA256SUMS
 
 # Debian / Ubuntu / TUXEDO OS
-sudo apt install ./system-telemetry-dashboard_0.1.0_all.deb
+sudo apt install ./system-telemetry-dashboard_0.2.0_all.deb
 
 # Fedora (no uses este comando en Debian / do not run this on Debian)
-sudo dnf install ./system-telemetry-dashboard-0.1.0-1.noarch.rpm
+sudo dnf install ./system-telemetry-dashboard-0.2.0-1.noarch.rpm
 
 system-telemetry
 ```
@@ -49,21 +49,35 @@ system fonts are used when unavailable.
 - CPU/GPU, RAM/swap, disco/red, sensores, historial y exportación CSV.
 - Temas claro/oscuro y traducción español/inglés.
 - Control de TUXEDO `tccd` o Power Profiles, incluida la interfaz de `tuned-ppd`.
-- Detección informativa de TLP, auto-cpufreq, tuned y System76 Power.
-- Wayland/X11 con decoraciones nativas; sin helper privilegiado.
+- Control del único gestor activo: TUXEDO, Power Profiles, tuned, auto-cpufreq o TLP.
+  tuned-ppd usa la interfaz Power Profiles; System76 Power solo se detecta.
+- Tarjetas con gráficos alineados e hilos CPU compactos: una fila hasta 12, dos para más.
+- Ventiladores AMD PWM y NVIDIA NV-CONTROL X11 cuando el driver los permite.
+  Pruebas manuales de 30 s, 50–100 %, retorno automático y límite de 80 °C.
+- Wayland/X11 con decoraciones nativas; helper restringido con autorización polkit.
 
 Hardware telemetry, history, CSV export, light/dark themes, Spanish/English,
 TUXEDO/Power Profiles integration and native Wayland/X11 decorations.
+Version 0.2.0 adds active-manager controls for tuned, auto-cpufreq and TLP,
+a restricted polkit helper, aligned charts and compact CPU bars.
+GPU manual fan tests are bounded to 30 seconds at 50–100%, restore automatic
+control on completion/errors and enforce an 80°C guard. AMD requires exposed
+PWM sensors; NVIDIA requires accessible X11 NV-CONTROL and driver permission.
 
 Las lecturas GPU dependen del hardware y del controlador. Los sensores ausentes
 se muestran como N/D; no se inventan temperaturas ni Watts. La carga Intel basada
 en clientes DRM accesibles no equivale a carga global. No se activan servicios
 ni se modifican curvas de ventiladores; un cambio de perfil puede ser rechazado
-por la política D-Bus existente.
+por la política D-Bus o polkit existente. Los perfiles TUXEDO son temporales.
+No se modifican Coolbits ni Xorg. No se inicia una prueba sobre otro control
+manual. El retorno automático no se puede garantizar ante SIGKILL o fallo del
+driver; estos controles no reemplazan la gestión térmica del fabricante.
 
 GPU readings depend on hardware and driver support. Missing values remain N/A.
 Intel accessible-client DRM load is not global utilization. No services are
-enabled and no fan curves are changed; existing D-Bus policy may reject changes.
+enabled and no fan curves are changed; existing D-Bus/polkit policy may reject
+changes. Cooling tests do not replace vendor thermal management. Automatic
+restoration cannot be guaranteed after SIGKILL or driver failure.
 
 ## Alcance / Scope
 
@@ -75,8 +89,12 @@ This repository publishes documentation and packages, not the source repository.
 Installable packages do contain the required Python modules. No open-source
 license is granted.
 
-La versión inicial se ha comprobado en TUXEDO OS/KDE Wayland. La instalación en
-todas las versiones de Debian, Ubuntu y Fedora indicadas aún no se ha verificado.
+La versión 0.2.0 se ha comprobado en TUXEDO OS/KDE Wayland con 58 pruebas.
+El usuario confirmó que la versión 0.1.0 funciona en Fedora; la instalación
+0.2.0 y los controles de cada gestor/GPU en Fedora aún requieren verificación.
+Las pruebas de escritura de controles usan sensores y herramientas simulados.
 
-The initial release was checked on TUXEDO OS/KDE Wayland; installation across
-every listed Debian, Ubuntu and Fedora version has not yet been verified.
+Version 0.2.0 was checked on TUXEDO OS/KDE Wayland with 58 passing tests.
+The user reported 0.1.0 working on Fedora; 0.2.0 installation and real manager/GPU
+controls on Fedora remain unverified. Control-writing tests use simulated
+sensors and tools. Packages are not GPG-signed; use SHA256SUMS for integrity.
